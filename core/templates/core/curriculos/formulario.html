@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Currículo{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    {% if object %}
+        <h1>Editar currículo</h1>
+        <p class="subtitle">Atualize seus dados profissionais.</p>
+    {% else %}
+        <h1>Cadastrar currículo</h1>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+            {% if field.name == 'arquivo_pdf' %}
+                <div class="file-card">
+                    <label>{{ field.label }}</label>
+
+                    <div class="file-upload">
+                        {{ field }}
+                        <small>
+                            Envie um arquivo PDF do seu currículo.
+                            Se já existir um arquivo, ele será substituído.
+                        </small>
+                    </div>
+
+                    {% if field.errors %}
+                        <span class="form-error">{{ field.errors }}</span>
+                    {% endif %}
+                </div>
+
+            {% elif field.name == 'remover_pdf' %}
+                {% if object and object.arquivo_pdf %}
+                    <div class="checkbox-wrapper">
+                        {{ field }}
+                        <label for="{{ field.id_for_label }}">
+                            Remover arquivo PDF atual
+                        </label>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <span class="form-error">{{ field.errors }}</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="actions">
+            <button type="submit" class="btn-primary">Salvar currículo</button>
+            <a href="{% url 'meu-curriculo' %}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

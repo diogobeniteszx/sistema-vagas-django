@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Currículo{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Meu currículo</h1>
+        <p class="subtitle">Gerencie suas informações profissionais e seu arquivo de currículo.</p>
+    </div>
+
+    {% if not curriculo %}
+        <a href="{% url 'criar-curriculo' %}" class="btn-primary">Cadastrar currículo</a>
+    {% endif %}
+</div>
+
+{% if curriculo %}
+    <div class="detail-card">
+        <h1>{{ curriculo.nome_completo }}</h1>
+
+        <div class="detail-info">
+            <p><strong>Telefone:</strong> {{ curriculo.telefone }}</p>
+            <p><strong>Formação:</strong> {{ curriculo.formacao }}</p>
+            <p><strong>Cadastrado em:</strong> {{ curriculo.criado_em|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <div class="detail-section">
+            <h3>Experiência profissional</h3>
+            <p class="text-multiline">{{ curriculo.experiencia }}</p>
+        </div>
+
+        {% if curriculo.arquivo_pdf %}
+            <div class="detail-section">
+                <h3>Arquivo do currículo</h3>
+
+                <div class="actions">
+                    <a href="{{ curriculo.arquivo_pdf.url }}" class="btn-secondary" target="_blank">
+                        Abrir currículo em PDF
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="actions">
+            <a href="{% url 'editar-curriculo' curriculo.pk %}" class="btn-primary">Editar currículo</a>
+            <a href="{% url 'excluir-curriculo' curriculo.pk %}" class="btn-danger">Excluir currículo</a>
+        </div>
+        
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2>Você ainda não cadastrou seu currículo</h2>
+        <p>Cadastre seu currículo para poder se candidatar às vagas disponíveis.</p>
+    </div>
+{% endif %}
+
+{% endblock %}

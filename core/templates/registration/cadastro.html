@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar conta{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    <h1>Criar conta</h1>
+
+    {% if form.errors %}
+        <div class="alert alert-error">
+            Verifique os dados e tente novamente.
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Usuário</label>
+            {{ form.username }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Senha</label>
+            {{ form.password1 }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Confirmar senha</label>
+            {{ form.password2 }}
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn-primary">Criar conta</button>
+            <a href="{% url 'login' %}" class="btn-secondary">Já tenho conta</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

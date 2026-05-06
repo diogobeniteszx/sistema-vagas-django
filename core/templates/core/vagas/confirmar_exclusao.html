@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Vaga{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    <h1>Excluir vaga</h1>
+
+    <p class="subtitle">
+        Tem certeza que deseja excluir a vaga <strong>{{ object.titulo }}</strong>?
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="actions">
+            <button type="submit" class="btn-danger">Sim, excluir</button>
+            <a href="{% url 'detalhe-vaga' object.pk %}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

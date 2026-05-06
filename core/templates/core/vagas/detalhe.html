@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Vaga{% endblock %}
+
+{% block content %}
+
+<div class="detail-card">
+    <div class="actions" style="margin-bottom: 16px;">
+        {% if vaga.ativa %}
+            <span class="badge">Ativa</span>
+        {% else %}
+            <span class="badge badge-danger">Inativa</span>
+        {% endif %}
+
+        <span class="badge">{{ vaga.get_modalidade_display }}</span>
+
+        {% if candidatura %}
+            <span class="badge badge-success">Candidatado</span>
+        {% endif %}
+    </div>
+
+    <h1>{{ vaga.titulo }}</h1>
+
+    <div class="detail-info">
+        <p><strong>Empresa:</strong> {{ vaga.empresa }}</p>
+        <p><strong>Cidade:</strong> {{ vaga.cidade }}</p>
+
+        {% if vaga.salario %}
+            <p><strong>Salário:</strong> R$ {{ vaga.salario }}</p>
+        {% else %}
+            <p><strong>Salário:</strong> A combinar</p>
+        {% endif %}
+
+        <p><strong>Publicada em:</strong> {{ vaga.data_publicacao|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <div class="detail-section">
+        <h3>Descrição da vaga</h3>
+        <p class="text-multiline">{{ vaga.descricao }}</p>
+    </div>
+
+    <div class="detail-section">
+        <h3>Requisitos</h3>
+        <p class="text-multiline">{{ vaga.requisitos }}</p>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'lista-vagas' %}" class="btn-secondary">Voltar</a>
+
+        {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'editar-vaga' vaga.pk %}" class="btn-primary">Editar</a>
+            <a href="{% url 'excluir-vaga' vaga.pk %}" class="btn-danger">Excluir</a>
+        {% endif %}
+
+        {% if user.is_authenticated and not user.is_staff %}
+            {% if candidatura %}
+                <form method="post" action="{% url 'remover-candidatura' candidatura.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-danger">Remover candidatura</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'candidatar-vaga' vaga.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary">Candidatar-se</button>
+                </form>
+            {% endif %}
+        {% elif not user.is_authenticated %}
+            <a href="{% url 'login' %}" class="btn-primary">Entrar para se candidatar</a>
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated and user.is_staff %}
+        <div class="detail-section">
+            <h3>Candidatos inscritos</h3>
+
+            {% if candidaturas_da_vaga %}
+                <div class="card-grid">
+                    {% for candidatura in candidaturas_da_vaga %}
+                        <div class="card">
+                            <span class="badge">{{ candidatura.status }}</span>
+
+                            <h3>{{ candidatura.curriculo.nome_completo }}</h3>
+
+                            <p><strong>Usuário:</strong> {{ candidatura.curriculo.usuario.username }}</p>
+                            <p><strong>Email:</strong> {{ candidatura.curriculo.usuario.email }}</p>
+                            <p><strong>Telefone:</strong> {{ candidatura.curriculo.telefone }}</p>
+                            <p><strong>Formação:</strong> {{ candidatura.curriculo.formacao }}</p>
+                            <p><strong>Candidatou-se em:</strong> {{ candidatura.data_candidatura|date:"d/m/Y H:i" }}</p>
+
+                            <div class="detail-section">
+                                <h3>Experiência</h3>
+                                <p class="text-multiline">{{ candidatura.curriculo.experiencia }}</p>
+                            </div>
+
+                            {% if candidatura.curriculo.arquivo_pdf %}
+                                <div class="actions">
+                                    <a href="{{ candidatura.curriculo.arquivo_pdf.url }}" class="btn-secondary" target="_blank">
+                                        Abrir currículo em PDF
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h2>Nenhuma candidatura ainda</h2>
+                    <p>Quando candidatos se inscreverem, eles aparecerão aqui.</p>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

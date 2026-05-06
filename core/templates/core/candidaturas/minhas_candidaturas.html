@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Minhas Candidaturas{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Minhas Candidaturas</h1>
+        <p class="subtitle">Acompanhe as vagas para as quais você enviou seu currículo.</p>
+    </div>
+</div>
+
+{% if candidaturas %}
+    <div class="card-grid">
+        {% for candidatura in candidaturas %}
+            <div class="card">
+                <span class="badge">{{ candidatura.status }}</span>
+
+                <h3>{{ candidatura.vaga.titulo }}</h3>
+
+                <p><strong>Empresa:</strong> {{ candidatura.vaga.empresa }}</p>
+                <p><strong>Cidade:</strong> {{ candidatura.vaga.cidade }}</p>
+                <p><strong>Enviada em:</strong> {{ candidatura.data_candidatura|date:"d/m/Y H:i" }}</p>
+
+                <div class="actions">
+                    <a href="{% url 'detalhe-vaga' candidatura.vaga.pk %}" class="btn-primary">
+                        Ver vaga
+                    </a>
+
+                    <form method="post" action="{% url 'remover-candidatura' candidatura.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-danger">Remover candidatura</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2>Nenhuma candidatura enviada</h2>
+        <p>Quando você se candidatar a uma vaga, ela aparecerá aqui.</p>
+    </div>
+{% endif %}
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a class="btn-secondary" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+    {% endif %}
+</div>
+
+{% endblock %}

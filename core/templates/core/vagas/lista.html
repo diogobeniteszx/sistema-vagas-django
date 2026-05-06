@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Vagas{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Vagas disponíveis</h1>
+        <p class="subtitle">Encontre oportunidades e candidate-se às vagas.</p>
+    </div>
+
+    {% if user.is_authenticated and user.is_staff %}
+        <a href="{% url 'criar-vaga' %}" class="btn-primary">Cadastrar vaga</a>
+    {% endif %}
+</div>
+
+<section class="filter-section">
+    <form method="get" class="filter-form">
+        <div class="filter-field">
+            <label for="busca">Buscar vagas</label>
+            <input
+                type="text"
+                id="busca"
+                name="busca"
+                placeholder="Digite titulo, empresa, cidade, modalidade ou requisito"
+                value="{{ request.GET.busca }}"
+            >
+        </div>
+
+        <div class="filter-field">
+            <label for="ordenar">Ordenar por</label>
+            <select id="ordenar" name="ordenar">
+                <option value="">Mais recentes</option>
+                <option value="antigas" {% if request.GET.ordenar == 'antigas' %}selected{% endif %}>Mais antigas</option>
+                <option value="menor_salario" {% if request.GET.ordenar == 'menor_salario' %}selected{% endif %}>Menor salário</option>
+                <option value="maior_salario" {% if request.GET.ordenar == 'maior_salario' %}selected{% endif %}>Maior salário</option>
+            </select>
+        </div>
+
+        <div class="filter-buttons">
+            <button type="submit" class="btn-primary">Buscar</button>
+            <a href="{% url 'lista-vagas' %}" class="btn-secondary">Limpar</a>
+        </div>
+    </form>
+</section>
+
+{% if vagas %}
+    <div class="card-grid">
+        {% for vaga in vagas %}
+            <div class="card">
+                <div class="actions" style="margin-bottom: 10px;">
+                    {% if vaga.ativa %}
+                        <span class="badge">Ativa</span>
+                    {% else %}
+                        <span class="badge badge-danger">Inativa</span>
+                    {% endif %}
+
+                    <span class="badge">{{ vaga.get_modalidade_display }}</span>
+
+                    {% if vaga.id in candidaturas_ids %}
+                        <span class="badge badge-success">Candidatado</span>
+                    {% endif %}
+                </div>
+
+                <h3>{{ vaga.titulo }}</h3>
+                <p><strong>Empresa:</strong> {{ vaga.empresa }}</p>
+                <p><strong>Cidade:</strong> {{ vaga.cidade }}</p>
+
+                {% if vaga.salario %}
+                    <p><strong>Salário:</strong> R$ {{ vaga.salario }}</p>
+                {% else %}
+                    <p><strong>Salário:</strong> A combinar</p>
+                {% endif %}
+
+                <div class="actions">
+                    <a href="{% url 'detalhe-vaga' vaga.pk %}" class="btn-primary">Ver detalhes</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2>Nenhuma vaga encontrada</h2>
+        <p>Assim que as vagas forem publicadas, elas aparecerão aqui.</p>
+    </div>
+{% endif %}
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a class="btn-secondary" href="?busca={{ request.GET.busca }}&ordenar={{ request.GET.ordenar }}&page={{ page_obj.previous_page_number }}">
+            Anterior
+        </a>
+    {% endif %}
+
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a class="btn-secondary" href="?busca={{ request.GET.busca }}&ordenar={{ request.GET.ordenar }}&page={{ page_obj.next_page_number }}">
+            Próxima
+        </a>
+    {% endif %}
+</div>
+
+{% endblock %}

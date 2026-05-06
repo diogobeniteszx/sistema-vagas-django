@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sistema de Vagas{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'lista-vagas' %}" class="logo">
+            Sistema<span>Vagas</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="{% url 'lista-vagas' %}">Vagas</a>
+
+            {% if user.is_authenticated %}
+                {% if not user.is_staff %}
+                    <a href="{% url 'minhas-candidaturas' %}">Candidaturas</a>
+                    <a href="{% url 'meu-curriculo' %}">Currículo</a>
+                {% endif %}
+
+                <span class="user-name">Olá, {{ user.username }}</span>
+
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-outline">Sair</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-outline">Entrar</a>
+                <a href="{% url 'cadastro' %}" class="btn-primary">Cadastrar</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer class="footer">
+    <p>2026 Sistema de Vagas - Todos os direitos reservados</p>
+</footer>
+
+</body>
+</html>

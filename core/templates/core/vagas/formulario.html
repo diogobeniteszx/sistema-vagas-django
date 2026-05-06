@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Formulário de Vaga{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    {% if object %}
+        <h1>Editar vaga</h1>
+    {% else %}
+        <h1>Cadastrar nova vaga</h1>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+            {% if field.name == 'ativa' %}
+                <div class="checkbox-wrapper">
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}">
+                        Vaga ativa e visível para candidatos
+                    </label>
+                </div>
+            {% else %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <span class="form-error">{{ field.errors }}</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="actions">
+            <button type="submit" class="btn-primary">Salvar</button>
+            <a href="{% url 'lista-vagas' %}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
